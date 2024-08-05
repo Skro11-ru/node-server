@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notes App</title>
+</head>
+<body>
+<h1>Notes</h1>
+<form id="noteForm">
+    <input type="text" id="noteText" placeholder="Enter your note" required>
+    <button type="submit">Add Note</button>
+</form>
+<ul id="notesList"></ul>
+
+<script>
+	const form = document.getElementById('noteForm');
+	const notesList = document.getElementById('notesList');
+
+	form.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		const text = document.getElementById('noteText').value;
+
+		const response = await fetch('/notes', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({text})
+		});
+
+		const newNote = await response.json();
+		const listItem = document.createElement('li');
+		listItem.textContent = newNote.text;
+		notesList.appendChild(listItem);
+		form.reset();
+	});
+
+	async function loadNotes() {
+		const response = await fetch('/notes');
+		const notes = await response.json();
+
+		notes.forEach(note => {
+			const listItem = document.createElement('li');
+			listItem.textContent = note.text;
+			notesList.appendChild(listItem);
+		});
+	}
+
+	loadNotes();
+</script>
+</body>
+</html>
